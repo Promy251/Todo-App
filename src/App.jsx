@@ -16,7 +16,7 @@ function App() {
     localStorage.setItem('todos', JSON.stringify(todos))
   }, [todos])
 
-  // DERIVED VALUES (calculated from state)
+  // DERIVED VALUES
   const remaining = todos.filter((todo) => !todo.done).length
   const visibleTodos = todos.filter((todo) => {
     if (filter === 'active') return !todo.done
@@ -40,6 +40,12 @@ function App() {
 
   function deleteTodo(id) {
     setTodos(todos.filter((todo) => todo.id !== id))
+  }
+
+  function editTodo(id, newText) {
+    setTodos(todos.map((todo) =>
+      todo.id === id ? { ...todo, text: newText } : todo
+    ))
   }
 
   function clearCompleted() {
@@ -74,6 +80,7 @@ function App() {
             todo={todo}
             onToggle={toggleTodo}
             onDelete={deleteTodo}
+            onEdit={editTodo}
           />
         ))}
       </ul>
