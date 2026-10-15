@@ -1,12 +1,30 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import TodoItem from './TodoItem'
 import './style.css'
 
 function App() {
-  // STATE: what the app remembers
-  const [todos, setTodos] = useState([])
+  // STATE
+  const [todos, setTodos] = useState(() => {
+    const saved = localStorage.getItem('todos')
+    return saved ? JSON.parse(saved) : []
+  })
   const [text, setText] = useState('')
+  const [filter, setFilter] = useState('all')
 
-  // ADD a new todo
+  // SAVE to localStorage whenever todos change
+  useEffect(() => {
+    localStorage.setItem('todos', JSON.stringify(todos))
+  }, [todos])
+
+  // DERIVED VALUES (calculated from state)
+  const remaining = todos.filter((todo) => !todo.done).length
+  const visibleTodos = todos.filter((todo) => {
+    if (filter === 'active') return !todo.done
+    if (filter === 'done') return todo.done
+    return true
+  })
+
+  // ACTIONS
   function addTodo() {
     if (text.trim() === '') return
     const newTodo = { id: Date.now(), text: text, done: false }
@@ -14,16 +32,18 @@ function App() {
     setText('')
   }
 
-  // TOGGLE done / not done
   function toggleTodo(id) {
     setTodos(todos.map((todo) =>
       todo.id === id ? { ...todo, done: !todo.done } : todo
     ))
   }
 
-  // DELETE a todo
   function deleteTodo(id) {
     setTodos(todos.filter((todo) => todo.id !== id))
+  }
+
+  function clearCompleted() {
+    setTodos(todos.filter((todo) => !todo.done))
   }
 
   // WHAT SHOWS ON SCREEN
@@ -41,21 +61,29 @@ function App() {
         <button onClick={addTodo}>Add</button>
       </div>
 
+      <div className="filters">
+        <button className={filter === 'all' ? 'active' : ''} onClick={() => setFilter('all')}>All</button>
+        <button className={filter === 'active' ? 'active' : ''} onClick={() => setFilter('active')}>Active</button>
+        <button className={filter === 'done' ? 'active' : ''} onClick={() => setFilter('done')}>Done</button>
+      </div>
+
       <ul>
-        {todos.map((todo) => (
-          <li key={todo.id}>
-            <input
-              type="checkbox"
-              checked={todo.done}
-              onChange={() => toggleTodo(todo.id)}
-            />
-            <span className={todo.done ? 'done' : ''}>{todo.text}</span>
-            <button className="delete" onClick={() => deleteTodo(todo.id)}>✕</button>
-          </li>
+        {visibleTodos.map((todo) => (
+          <TodoItem
+            key={todo.id}
+            todo={todo}
+            onToggle={toggleTodo}
+            onDelete={deleteTodo}
+          />
         ))}
       </ul>
 
-      {todos.length === 0 && <p className="empty">Nothing to do yet!</p>}
+      {visibleTodos.length === 0 && <p className="empty">Nothing here!</p>}
+
+      <div className="footer">
+        <p className="counter">{remaining} of {todos.length} tasks left</p>
+        <button className="clear" onClick={clearCompleted}>Clear completed</button>
+      </div>
     </div>
   )
 }

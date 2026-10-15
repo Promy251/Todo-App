@@ -71,3 +71,40 @@ li span {
   text-align: center;
   color: #999;
 }
+
+.filters {
+  display: flex;
+  gap: 6px;
+  margin-top: 16px;
+}
+
+.filters button {
+  flex: 1;
+  background: #eee;
+  color: #333;
+}
+
+.filters button.active {
+  background: #6c5ce7;
+  color: white;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.counter {
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+}
+
+.clear {
+  background: #ddd;
+  color: #333;
+  font-size: 13px;
+  padding: 6px 10px;
+}
