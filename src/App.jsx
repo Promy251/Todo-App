@@ -1,65 +1,63 @@
-import { useState } from "react";
+import { useState } from 'react'
+import './style.css'
 
 function App() {
-  const [count, setCount] = useState(0);
+  // STATE: what the app remembers
+  const [todos, setTodos] = useState([])
+  const [text, setText] = useState('')
 
+  // ADD a new todo
+  function addTodo() {
+    if (text.trim() === '') return
+    const newTodo = { id: Date.now(), text: text, done: false }
+    setTodos([...todos, newTodo])
+    setText('')
+  }
+
+  // TOGGLE done / not done
+  function toggleTodo(id) {
+    setTodos(todos.map((todo) =>
+      todo.id === id ? { ...todo, done: !todo.done } : todo
+    ))
+  }
+
+  // DELETE a todo
+  function deleteTodo(id) {
+    setTodos(todos.filter((todo) => todo.id !== id))
+  }
+
+  // WHAT SHOWS ON SCREEN
   return (
-    <main className="page">
-      <section className="starter-card">
-        <div className="eyebrow">
-          <span className="status-dot" aria-hidden="true" />
-          React JavaScript starter
-        </div>
+    <div className="app">
+      <h1>My Todo List</h1>
 
-        <h1>
-          Build something
-          <br />
-          <span>great.</span>
-        </h1>
-        <p className="intro">
-          Your React app is ready. Make a change, save the file, and see it
-          update instantly.
-        </p>
+      <div className="input-row">
+        <input
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && addTodo()}
+          placeholder="What do you need to do?"
+        />
+        <button onClick={addTodo}>Add</button>
+      </div>
 
-        <div className="counter-panel">
-          <div>
-            <p className="counter-label">Clicks so far</p>
-            <p className="counter-value" aria-live="polite">
-              {count}
-            </p>
-          </div>
-          <button
-            className="counter-button"
-            onClick={() => setCount((current) => current + 1)}
-          >
-            Count up <span aria-hidden="true">↗</span>
-          </button>
-        </div>
+      <ul>
+        {todos.map((todo) => (
+          <li key={todo.id}>
+            <input
+              type="checkbox"
+              checked={todo.done}
+              onChange={() => toggleTodo(todo.id)}
+            />
+            <span className={todo.done ? 'done' : ''}>{todo.text}</span>
+            <button className="delete" onClick={() => deleteTodo(todo.id)}>✕</button>
+          </li>
+        ))}
+      </ul>
 
-        <div className="quick-start">
-          <h2>Quick start</h2>
-          <ol>
-            <li>
-              Edit <code>src/App.jsx</code> to build your app.
-            </li>
-            <li>
-              Add styles in <code>src/style.css</code>.
-            </li>
-            <li>Your changes appear here as you work.</li>
-          </ol>
-        </div>
-
-        <footer className="resource-links">
-          <a href="https://react.dev/learn" target="_blank" rel="noreferrer">
-            React docs <span aria-hidden="true">↗</span>
-          </a>
-          <a href="https://vite.dev/guide/" target="_blank" rel="noreferrer">
-            Vite docs <span aria-hidden="true">↗</span>
-          </a>
-        </footer>
-      </section>
-    </main>
-  );
+      {todos.length === 0 && <p className="empty">Nothing to do yet!</p>}
+    </div>
+  )
 }
 
-export default App;
+export default App
